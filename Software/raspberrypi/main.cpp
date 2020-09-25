@@ -71,7 +71,6 @@ void SPI_Setup()
    // 500000 indicates bus speed.
    fd_spi = wiringPiSPISetup(CHANNEL, 5000000);//5000 //500000
    printf("fd_spi:%d\n",fd_spi);
-
    sleep(1);
 }
 
@@ -242,7 +241,6 @@ close(fd_spi);
                   spi_buffer[1] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
                   spi_buffer[3] = buffer[xp];
-                  SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x30)//get count
                {

@@ -69,7 +69,7 @@ void SPI_Setup()
    // Configure the interface.
    // CHANNEL insicates chip select,
    // 500000 indicates bus speed.
-   fd_spi = wiringPiSPISetup(CHANNEL, 5000000);//5000 //500000
+   fd_spi = wiringPiSPISetupMode(CHANNEL, 5000,0);//5000 //500000
    printf("fd_spi:%d\n",fd_spi);
    sleep(1);
 }
@@ -98,11 +98,11 @@ void SPI_write(unsigned char * buffer,int len)
       printf("%02X ",local_buffer[xp]);
    printf(" ");
    wiringPiSPIDataRW(CHANNEL, local_buffer, len);
+
    printf("returned len:%d ",len);
    for(int xp=0;xp<len;xp++)
       printf("%02X ",local_buffer[xp]);
    printf("\n");
-   usleep(20);
 }
 
 int main()
@@ -241,6 +241,7 @@ close(fd_spi);
                   spi_buffer[1] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
                   spi_buffer[3] = buffer[xp];
+		  SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x30)//get count
                {
@@ -256,6 +257,7 @@ close(fd_spi);
                   printf("close\n");
                }
 	       printf("xp:%d\n",xp);
+	       sleep(1);
             }
 
             //printf("write back\n");

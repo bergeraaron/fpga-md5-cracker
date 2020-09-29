@@ -15,6 +15,12 @@
 #include <time.h> 
 
 using namespace std;
+/**
+hashes to test
+84dfb6902da20f8bbefd102e73509aa0 - bergera
+527bd5b5d689e2c32ae974c6229ff785 - john
+6d696d3f9b54c9c51fb23b7a5de2ed5e - pivot123
+**/
 
 // channel is the wiringPi name for the chip select (or chip enable) pin.
 // Set this to 0 or 1, depending on how it's connected.
@@ -26,6 +32,8 @@ bool running = true;
 
 int listenfd = 0, connfd = 0;
 struct sockaddr_in serv_addr; 
+
+unsigned char hextobytel(char s);
 
 void SigHandler(int sig)
 {
@@ -105,7 +113,7 @@ void SPI_write(unsigned char * buffer,int len)
    printf("\n");
 }
 
-int main()
+int main(int argc, char * argv[])
 {
    int fd, result, ret;
    unsigned char buffer[100];
@@ -122,30 +130,70 @@ int main()
    unsigned char get_cnt_low_spi_buffer[4] = {0x52,0x30,0x30,0x00};//low
    unsigned char get_cnt_high_spi_buffer[4] = {0x52,0x30,0x10,0x01};//high
 
-   //original UI program talks to a tcp server
+   unsigned char hash_offset[32] = {
+      0x67,0x45,0x23,0x01,
+      0xef,0xcd,0xab,0x89,
+      0x98,0xba,0xdc,0xfe,
+      0x10,0x32,0x54,0x76
+   }
+
+   bool tcp_server = true;
+
+   unsigned char md5_hash_in[64];memset(md5_hash_in,0x00,64);
+   unsigned char md5_hash[32];memset(md5_hash,0x00,32);
+   //read in our command line arguments
+   for(int we=;we<argc;we++)
+   {
+      if(strcmp(argv[we],"-h") == 0)
+      {
+         //the hash we are going to look at
+         tcp_server = false;
+         snprintf(md5_hash_in,64,"%s",argv[we+1]);
+      }
+   }
 
    char sendBuff[1025];
-   time_t ticks; 
 
    SetupSigHandler();
 
-SPI_Setup();
-/**
-unsigned char test = 0xAA;
-while(true)
-{
-printf("test\n");
-SPI_write(r_reset_spi_buffer,4);
-sleep(1);
-}
-close(fd_spi);
-**/
-/**
-   printf("r_reset generator\n");
-   SPI_write(r_reset_spi_buffer,4);
-**/
+   SPI_Setup();
 
-   while(running)
+   //we need to parse out the hash into something useable
+   //convert the string payload to bytes
+   unsigned char tmpc[2];
+   int c = 0;
+   for(int i = 0;i < 32;i++)
+   {
+      tmpc[0] = hextobytel(md5_hash_in[i]);i++;
+      tmpc[1] = hextobytel(md5_hash_in[i]);
+      md5_hash[c] = ((tmpc[0] << 4) | tmpc[1]);
+      c++;
+   }
+
+   printf("md5_has_in:%s\n",md5_hash_in);
+   
+   printf("md5_hash ");
+   for(int xp = 0;xp < 32;xp++)
+   {
+      printf("%02",md5_hash[xp]);
+   }
+   printf("\n");
+
+   //the fpga expects the parts to be offset a certain way
+   printf("md5_hash minus");
+   for(int xp = 0;xp < 32;xp++)
+   {
+      md5_hash[xp] = md5_hash[xp] - hash_offset[xp];
+      printf("%02",md5_hash[xp]);
+   }
+   printf("\n");
+
+   printf("hopefully we have something we can send now...\n");
+
+
+   //original UI program talks to a tcp server
+/**
+   while(running && tcp_server)
    {
       printf("open up a socket to listen on\n");
 
@@ -270,6 +318,44 @@ close(fd_spi);
       }
       close(connfd);
    }
+**/
 
 }
 
+unsigned char hextobytel(char s)
+{
+    if(s == '0')
+        return 0x0;
+    else if(s == '1')
+        return 0x1;
+    else if(s == '2')
+        return 0x2;
+    else if(s == '3')
+        return 0x3;
+    else if(s == '4')
+        return 0x4;
+    else if(s == '5')
+        return 0x5;
+    else if(s == '6')
+        return 0x6;
+    else if(s == '7')
+        return 0x7;
+    else if(s == '8')
+        return 0x8;
+    else if(s == '9')
+        return 0x9;
+    else if(s == 'A')
+        return 0xA;
+    else if(s == 'B')
+        return 0xB;
+    else if(s == 'C')
+        return 0xC;
+    else if(s == 'D')
+        return 0xD;
+    else if(s == 'E')
+        return 0xE;
+    else if(s == 'F')
+        return 0xF;
+    else
+	return 0x0;
+}

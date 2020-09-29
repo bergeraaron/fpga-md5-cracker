@@ -193,10 +193,10 @@ close(fd_spi);
                   printf("set expected A\n");
                   SPI_write(set_exp_a_spi_buffer,4);
                   xp++;
-                  spi_buffer[0] = buffer[xp];xp++;
-                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[3] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
-                  spi_buffer[3] = buffer[xp];
+                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[0] = buffer[xp];
                   SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x11)//set expected B
@@ -204,10 +204,10 @@ close(fd_spi);
                   printf("set expected B\n");
                   SPI_write(set_exp_b_spi_buffer,4);
                   xp++;
-                  spi_buffer[0] = buffer[xp];xp++;
-                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[3] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
-                  spi_buffer[3] = buffer[xp];
+                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[0] = buffer[xp];
                   SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x12)//set expected C
@@ -215,10 +215,10 @@ close(fd_spi);
                   printf("set expected C\n");
                   SPI_write(set_exp_c_spi_buffer,4);
                   xp++;
-                  spi_buffer[0] = buffer[xp];xp++;
-                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[3] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
-                  spi_buffer[3] = buffer[xp];
+                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[0] = buffer[xp];
                   SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x13)//set expected D
@@ -226,10 +226,10 @@ close(fd_spi);
                   printf("set expected D\n");
                   SPI_write(set_exp_d_spi_buffer,4);
                   xp++;
-                  spi_buffer[0] = buffer[xp];xp++;
-                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[3] = buffer[xp];xp++;
                   spi_buffer[2] = buffer[xp];xp++;
-                  spi_buffer[3] = buffer[xp];
+                  spi_buffer[1] = buffer[xp];xp++;
+                  spi_buffer[0] = buffer[xp];
                   SPI_write(spi_buffer,4);
                }
                else if(buffer[xp] == 0x20)//set range

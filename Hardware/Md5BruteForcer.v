@@ -12,9 +12,12 @@ module Md5BruteForcer(
 reg matchFound = 0;
 
 wire [31:0] a, b, c, d;
-reg [31:0] expectedA = 'hffffffff, expectedB = 0, expectedC = 0, expectedD = 0;
+//reg [31:0] expectedA = 'hffffffff, expectedB = 0, expectedC = 0, expectedD = 0;
+//reg [31:0] expectedA = 'h4e905851, expectedB = 'hd414de4d, expectedC = 'h2dba0c2c, expectedD = 'h75c54aac;
+reg [31:0] expectedA = 'h2971bc83, expectedB = 'h9b41f6a4, expectedC = 'h955620c0, expectedD = 'h9067fbfd;
 reg [63:0] count;
 reg [7:0] min = 'h61, max = 'h7a;
+//reg [7:0] min = 'h41, max = 'h7a;
 wire [511:0] chunk;
 
 reg [127:0] textBuffer [0:63];
@@ -54,6 +57,7 @@ always @(posedge clk or posedge reset2)
 	begin
 		if (reset2)
 			begin
+				hasMatched <= 0;
 				matchFound <= 0;
 				text <= 0;
             count <= 0;
@@ -127,16 +131,23 @@ always @(posedge clk or posedge reset2)
 						textBuffer[62] <= textBuffer[61];
 						textBuffer[63] <= textBuffer[62];
 						text <= textBuffer[63];
-						
+/**/
 						if (a == expectedA &&
 							b == expectedB &&
 							c == expectedC &&
 							d == expectedD)
 							begin
 								matchFound <= 1;
-								hasMatched <= 1;						
+								hasMatched <= 1;
 							end
-                     
+/**/
+/**
+						if (a == expectedA)
+							begin
+								matchFound <= 1;
+								hasMatched <= 1;
+							end
+**/
                   count <= count + 1;
 					end
 			end
@@ -172,47 +183,74 @@ always @(posedge hasReceived)
 		case (controllerState)
 			`Controller_Waiting:
 				begin
+					dataOut <= 32'b00000000000000000000000000000000;
 					case (dataIn)
-						`Command_ResetGenerator: 
+						`Command_ResetGenerator:
 							begin
 								resetGenerator <= 1;
 								reset2 <= 1;
+								dataOut <= 32'b11111111111111111111111111111111;
 							end
-						`Command_StartGenerator: 
+						`Command_StartGenerator:
 							begin
 								resetGenerator <= 0;
 								reset2 <= 0;
+								dataOut <= 32'b01010101010101010101010101010101;
 							end
-						`Command_SetExpectedA: controllerState <= `Controller_SetExpectedA;
-						`Command_SetExpectedB: controllerState <= `Controller_SetExpectedB;
-						`Command_SetExpectedC: controllerState <= `Controller_SetExpectedC;
-						`Command_SetExpectedD: controllerState <= `Controller_SetExpectedD;
-						`Command_SetRange: controllerState <= `Controller_SetRange;
-                  `Command_GetCountLow: dataOut <= count[31:0];
-                  `Command_GetCountHigh: dataOut <= count[63:32];
+						`Command_SetExpectedA:
+							begin
+								controllerState <= `Controller_SetExpectedA;
+							end
+						`Command_SetExpectedB:
+							begin
+								controllerState <= `Controller_SetExpectedB;
+							end
+						`Command_SetExpectedC:
+							begin
+								controllerState <= `Controller_SetExpectedC;
+							end
+						`Command_SetExpectedD:
+							begin
+								controllerState <= `Controller_SetExpectedD;
+							end
+						`Command_SetRange:
+							begin
+								controllerState <= `Controller_SetRange;
+							end
+                  `Command_GetCountLow:
+							begin
+								dataOut <= count[31:0];
+							end
+                  `Command_GetCountHigh:
+							begin
+								dataOut <= count[63:32];
+							end
 					endcase					
 				end
 			`Controller_SetExpectedA:
 				begin
 					expectedA <= dataIn;
 					controllerState <= `Controller_Waiting;
+					dataOut <= 32'b00000000111111110000000011111111;
 				end
 			`Controller_SetExpectedB:
 				begin
 					expectedB <= dataIn;
 					controllerState <= `Controller_Waiting;
+					dataOut <= 32'b11111111000000001111111100000000;
 				end
 			`Controller_SetExpectedC:
 				begin
 					expectedC <= dataIn;
 					controllerState <= `Controller_Waiting;
+					dataOut <= 32'b11111111111111110000000000000000;
 				end
 			`Controller_SetExpectedD:
 				begin
 					expectedD <= dataIn;
 					controllerState <= `Controller_Waiting;
+					dataOut <= 32'b00000000000000001111111111111111;
 				end
-				
 			`Controller_SetRange:
 				begin
 					min <= dataIn[7:0];
@@ -220,6 +258,7 @@ always @(posedge hasReceived)
 					//min <= 8'h61;
 					//max <= 8'h7a;
 					controllerState <= `Controller_Waiting;
+					dataOut <= 32'b10101010101010101010101010101010;
 				end
 		endcase	
 	end

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <errno.h>
-#include <wiringPiSPI.h>
+//#include <wiringPiSPI.h>
 #include <signal.h>
 #include <assert.h>
 #include <sys/socket.h>
@@ -77,7 +77,7 @@ void SPI_Setup()
    // Configure the interface.
    // CHANNEL insicates chip select,
    // 500000 indicates bus speed.
-   fd_spi = wiringPiSPISetupMode(CHANNEL, 5000,0);//5000 //500000
+//   fd_spi = wiringPiSPISetupMode(CHANNEL, 5000,0);//5000 //500000
    printf("fd_spi:%d\n",fd_spi);
    sleep(1);
 }
@@ -105,7 +105,7 @@ void SPI_write(unsigned char * buffer,int len)
    for(int xp=0;xp<len;xp++)
       printf("%02X ",local_buffer[xp]);
    printf(" ");
-   wiringPiSPIDataRW(CHANNEL, local_buffer, len);
+//   wiringPiSPIDataRW(CHANNEL, local_buffer, len);
 
    printf("returned len:%d ",len);
    for(int xp=0;xp<len;xp++)
@@ -135,14 +135,20 @@ int main(int argc, char * argv[])
       0xef,0xcd,0xab,0x89,
       0x98,0xba,0xdc,0xfe,
       0x10,0x32,0x54,0x76
-   }
+   };
+
+   uint32_t expected_off[4];
+   expected_off[0] = 0x67452301;
+   expected_off[1] = 0xefcdab89;
+   expected_off[2] = 0x98badcfe;
+   expected_off[3] = 0x10325476;
 
    bool tcp_server = true;
 
-   unsigned char md5_hash_in[64];memset(md5_hash_in,0x00,64);
+   char md5_hash_in[64];memset(md5_hash_in,0x00,64);
    unsigned char md5_hash[32];memset(md5_hash,0x00,32);
    //read in our command line arguments
-   for(int we=;we<argc;we++)
+   for(int we=0;we<argc;we++)
    {
       if(strcmp(argv[we],"-h") == 0)
       {
@@ -156,7 +162,7 @@ int main(int argc, char * argv[])
 
    SetupSigHandler();
 
-   SPI_Setup();
+//   SPI_Setup();
 
    //we need to parse out the hash into something useable
    //convert the string payload to bytes
@@ -173,18 +179,40 @@ int main(int argc, char * argv[])
    printf("md5_has_in:%s\n",md5_hash_in);
    
    printf("md5_hash ");
-   for(int xp = 0;xp < 32;xp++)
+   for(int xp = 0;xp < 16;xp++)
    {
-      printf("%02",md5_hash[xp]);
+      printf("%02X",md5_hash[xp]);
    }
    printf("\n");
 
    //the fpga expects the parts to be offset a certain way
-   printf("md5_hash minus");
-   for(int xp = 0;xp < 32;xp++)
+   uint32_t temp_hash = 0;
+   int off = 0;
+   for(int xp=0;xp<4;xp++)
    {
-      md5_hash[xp] = md5_hash[xp] - hash_offset[xp];
-      printf("%02",md5_hash[xp]);
+      temp_hash = (uint8_t)md5_hash[off+0] | 
+                  (uint8_t)md5_hash[off+1] << 8 | 
+                  (uint8_t)md5_hash[off+2] << 16 | 
+                  (uint8_t)md5_hash[off+3] << 24;
+
+      //printf("temp_hash:%08X\n",temp_hash);
+
+      temp_hash -= expected_off[xp];
+
+      //printf("temp_hash:%08X\n",temp_hash);
+
+      md5_hash[off+3] = temp_hash & 0xFF;
+      md5_hash[off+2] = (temp_hash >> 8) & 0xFF;
+      md5_hash[off+1] = (temp_hash >> 16) & 0xFF;
+      md5_hash[off+0] = (temp_hash >> 24) & 0xFF;
+      off+=4;
+   }
+
+
+   printf("md5_hash minus ");
+   for(int xp = 0;xp < 16;xp++)
+   {
+      printf("%02X",md5_hash[xp]);
    }
    printf("\n");
 
@@ -344,17 +372,17 @@ unsigned char hextobytel(char s)
         return 0x8;
     else if(s == '9')
         return 0x9;
-    else if(s == 'A')
+    else if(s == 'A' || s == 'a')
         return 0xA;
-    else if(s == 'B')
+    else if(s == 'B' || s == 'b')
         return 0xB;
-    else if(s == 'C')
+    else if(s == 'C' || s == 'c')
         return 0xC;
-    else if(s == 'D')
+    else if(s == 'D' || s == 'd')
         return 0xD;
-    else if(s == 'E')
+    else if(s == 'E' || s == 'e')
         return 0xE;
-    else if(s == 'F')
+    else if(s == 'F' || s == 'f')
         return 0xF;
     else
 	return 0x0;

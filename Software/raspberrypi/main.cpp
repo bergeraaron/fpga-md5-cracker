@@ -333,27 +333,27 @@ int main(int argc, char * argv[])
       printf("send the reset command");
       printf("reset generator\n");
       SPI_write(reset_spi_buffer,4);
-
+sleep(1);
       printf("set expected A\n");
       SPI_write(set_exp_a_spi_buffer,4);
       memcpy(spi_buffer,&md5_hash[0],4);
       SPI_write(spi_buffer,4);
-
+sleep(1);
       printf("set expected B\n");
       SPI_write(set_exp_b_spi_buffer,4);
       memcpy(spi_buffer,&md5_hash[4],4);
       SPI_write(spi_buffer,4);
-
+sleep(1);
       printf("set expected C\n");
       SPI_write(set_exp_c_spi_buffer,4);
       memcpy(spi_buffer,&md5_hash[8],4);
       SPI_write(spi_buffer,4);
-
+sleep(1);
       printf("set expected D\n");
       SPI_write(set_exp_d_spi_buffer,4);
       memcpy(spi_buffer,&md5_hash[12],4);
       SPI_write(spi_buffer,4);
-
+sleep(1);
       printf("start generator\n");
       SPI_write(start_spi_buffer,4);
    }

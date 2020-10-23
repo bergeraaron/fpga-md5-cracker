@@ -1,6 +1,7 @@
 #include <iostream>
 #include <errno.h>
 #include <wiringPiSPI.h>
+#include <wiringPi.h>
 #include <signal.h>
 #include <assert.h>
 #include <sys/socket.h>
@@ -20,6 +21,9 @@ hashes to test
 84dfb6902da20f8bbefd102e73509aa0 - bergera
 527bd5b5d689e2c32ae974c6229ff785 - john
 **/
+
+#define PIN_HM 17 
+#define PIN_RG 27
 
 // channel is the wiringPi name for the chip select (or chip enable) pin.
 // Set this to 0 or 1, depending on how it's connected.
@@ -100,6 +104,15 @@ void SPI_write(unsigned char * buffer,int len)
    printf("\n");
 }
 
+void monitor_pins_setup()
+{
+	wiringPiSetupGpio();
+	pinMode(PIN_HM,INPUT);//Hash Matched
+	pullUpDnControl(PIN_HM,PUD_DOWN);
+	pinMode(PIN_RG,INPUT);//Reset Generator
+	pullUpDnControl(PIN_RG,PUD_DOWN);
+}
+
 int main(int argc, char * argv[])
 {
    int fd, result, ret;
@@ -149,6 +162,8 @@ int main(int argc, char * argv[])
    SetupSigHandler();
 
    SPI_Setup();
+
+   monitor_pins_setup();
 
    if(tcp_server)
    {
@@ -330,10 +345,18 @@ int main(int argc, char * argv[])
 **/
       printf("hopefully we have something we can send now...\n");
 
+      printf("check the pins\n");
+      printf("PIN_HM:%d\n",digitalRead(PIN_HM));
+      printf("PIN_RG:%d\n",digitalRead(PIN_RG));
+
       printf("send the reset command");
       printf("reset generator\n");
       SPI_write(reset_spi_buffer,4);
 sleep(1);
+
+      printf("PIN_HM:%d\n",digitalRead(PIN_HM));
+      printf("PIN_RG:%d\n",digitalRead(PIN_RG));
+
       printf("set expected A\n");
       SPI_write(set_exp_a_spi_buffer,4);
       memcpy(spi_buffer,&md5_hash[0],4);
@@ -356,6 +379,18 @@ sleep(1);
 sleep(1);
       printf("start generator\n");
       SPI_write(start_spi_buffer,4);
+
+      //loop and look for a response
+      while(true)
+      {
+	printf("check pins\n");
+	if(digitalRead(PIN_HM))
+		printf("hash matched\n");
+	if(digitalRead(PIN_RG))
+		printf("reset generator\n");
+
+	sleep(10);
+      }
    }
 
    return 0;

@@ -129,6 +129,7 @@ int main(int argc, char * argv[])
    unsigned char set_range_spi_buffer[4] = {0x52,0x30,0x20,0x00};
    unsigned char get_cnt_low_spi_buffer[4] = {0x52,0x30,0x30,0x00};//low
    unsigned char get_cnt_high_spi_buffer[4] = {0x52,0x30,0x10,0x01};//high
+   unsigned char get_text_char[4] = {0x44,0x33,0x22,0x11};
 
    uint32_t expected_off[4];
    expected_off[0] = 0x67452301;
@@ -385,7 +386,10 @@ sleep(1);
       {
 	printf("check pins\n");
 	if(digitalRead(PIN_HM))
+	{
 		printf("hash matched\n");
+		SPI_write(get_text_char,4);
+	}
 	if(digitalRead(PIN_RG))
 		printf("reset generator\n");
 

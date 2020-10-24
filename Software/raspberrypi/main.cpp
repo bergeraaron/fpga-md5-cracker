@@ -21,7 +21,7 @@ hashes to test
 84dfb6902da20f8bbefd102e73509aa0 - bergera
 527bd5b5d689e2c32ae974c6229ff785 - john
 **/
-
+//pins for the hash match and the resetting of the generator
 #define PIN_HM 17 
 #define PIN_RG 27
 
@@ -87,7 +87,6 @@ void SPI_Setup()
 
 void SPI_write(unsigned char * buffer,int len)
 {
-
    unsigned char local_buffer[4];
    for(int xp=0;xp<len;xp++)
       local_buffer[xp] = buffer[xp];
@@ -101,6 +100,19 @@ void SPI_write(unsigned char * buffer,int len)
    printf("returned len:%d ",len);
    for(int xp=0;xp<len;xp++)
       printf("%02X ",local_buffer[xp]);
+   printf("\n");
+}
+
+void SPI_write_and_read(unsigned char * buffer, int * len)
+{
+   printf("write to the spi len:%d ",*len);
+   for(int xp=0;xp<*len;xp++)
+      printf("%02X ",buffer[xp]);
+   printf(" ");
+   wiringPiSPIDataRW(CHANNEL, buffer, *len);
+   printf("returned len:%d ",*len);
+   for(int xp=0;xp<*len;xp++)
+      printf("%02X ",buffer[xp]);
    printf("\n");
 }
 
@@ -136,6 +148,10 @@ int main(int argc, char * argv[])
    expected_off[1] = 0xefcdab89;
    expected_off[2] = 0x98badcfe;
    expected_off[3] = 0x10325476;
+
+   unsigned char plain_text[64]; memset(plain_text,0x00,64);
+   uint8_t pt_ctr = 0;
+   unsigned char empty[64];memset(empty,0x00,64);
 
    bool tcp_server = true;
 
@@ -384,16 +400,34 @@ sleep(1);
       //loop and look for a response
       while(true)
       {
-	printf("check pins\n");
-	if(digitalRead(PIN_HM))
-	{
-		printf("hash matched\n");
-		SPI_write(get_text_char,4);
-	}
-	if(digitalRead(PIN_RG))
-		printf("reset generator\n");
+         printf("check pins\n");
+         if(digitalRead(PIN_HM))
+         {
+            printf("hash matched\n");
+            printf("pull the plain text off\n");
+            int len = 4;
+            unsigned char buffer[4];
+            for(int xp=0;xp<5;xp++)
+            {
+               memcpy(buffer,get_text_char,4);
+               SPI_write_and_read(buffer,&len);
+               if(!memcmp(buffer,empty,len))
+               {
+                  for(int re=0;re<len;re++)
+                  {
+                     plain_text[pt_ctr] = buffer[len-re];
+                     pt_ctr++;
+                  }
+               }
+            }
+            printf("print it back out\n");
+            printf("plain_text:%s\n",plain_text);
+            break;
+         }
+         if(digitalRead(PIN_RG))
+            printf("reset generator\n");
 
-	sleep(10);
+           sleep(1);
       }
    }
 

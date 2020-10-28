@@ -15,6 +15,8 @@
 #include <sys/types.h>
 #include <time.h> 
 
+#include <openssl/md5.h>
+
 using namespace std;
 /**
 hashes to test
@@ -80,13 +82,17 @@ void SPI_Setup()
    // Configure the interface.
    // CHANNEL insicates chip select,
    // 500000 indicates bus speed.
-   fd_spi = wiringPiSPISetupMode(CHANNEL, 5000,0);//5000 //500000
+   fd_spi = wiringPiSPISetupMode(CHANNEL, 500000,0);//5000 //500000
    printf("fd_spi:%d\n",fd_spi);
    sleep(1);
 }
 
 void SPI_write(unsigned char * buffer,int len)
 {
+   //noop
+   //unsigned char noop[4]={0x00,0x00,0x00,0x00};
+   //wiringPiSPIDataRW(CHANNEL, noop, 4);
+     
    unsigned char local_buffer[4];
    for(int xp=0;xp<len;xp++)
       local_buffer[xp] = buffer[xp];
@@ -105,6 +111,8 @@ void SPI_write(unsigned char * buffer,int len)
 
 void SPI_write_and_read(unsigned char * buffer, int * len)
 {
+   //unsigned char noop[4]={0x00,0x00,0x00,0x00};
+   //wiringPiSPIDataRW(CHANNEL, noop, 4);
    printf("write to the spi len:%d ",*len);
    for(int xp=0;xp<*len;xp++)
       printf("%02X ",buffer[xp]);
@@ -143,6 +151,11 @@ int main(int argc, char * argv[])
    unsigned char get_cnt_high_spi_buffer[4] = {0x52,0x30,0x10,0x01};//high
    unsigned char get_text_char[4] = {0x44,0x33,0x22,0x11};
 
+   unsigned char get_txt_char[3][4] = { 
+   		                   {0x44,0x00,0x00,0x01},
+                                   {0x44,0x00,0x00,0x02},
+		                   {0x44,0x00,0x00,0x03}
+                                      };
    uint32_t expected_off[4];
    expected_off[0] = 0x67452301;
    expected_off[1] = 0xefcdab89;
@@ -171,6 +184,28 @@ int main(int argc, char * argv[])
             printf("no hash supplied\n");
             return 0;
          }
+      }
+      if(strcmp(argv[we],"-p") == 0)
+      {
+	  if(strlen(argv[we+1]) == 0)
+	  {
+              printf("no password provided\n");
+	      return 0;
+	  }
+          tcp_server = false;
+	  MD5(((unsigned char*)(argv[we+1])),strlen(argv[we+1]),(unsigned char*)md5_hash_in);
+	  char tmpbuf[64];memset(tmpbuf,0x00,64);
+	  for(int xp=0;xp <(strlen(md5_hash_in));xp++)
+	  {
+		  printf("%02X",md5_hash_in[xp]);
+		  sprintf(tmpbuf,"%s%02X",tmpbuf,md5_hash_in[xp]);
+	  }
+	  printf("\n");
+	  printf("tmpbuf:%s\n",tmpbuf);
+	  memset(md5_hash_in,0x00,64);
+          for(int xp=0;xp < strlen(tmpbuf);xp++)
+		md5_hash_in[xp] = tmpbuf[xp];	  
+	  //return 0;
       }
    }
 
@@ -401,31 +436,46 @@ sleep(1);
       while(true)
       {
          printf("check pins\n");
+
          if(digitalRead(PIN_HM))
          {
             printf("hash matched\n");
             printf("pull the plain text off\n");
             int len = 4;
             unsigned char buffer[4];
+	    int cctr=0;
             for(int xp=0;xp<5;xp++)
             {
-               memcpy(buffer,get_text_char,4);
+               memcpy(buffer,get_txt_char[cctr],4);
                SPI_write_and_read(buffer,&len);
-               if(!memcmp(buffer,empty,len))
+sleep(1);
+	       printf("return len:%d\n",len);
+	       for(int re=0;re<len;re++)
+		printf("%02X ",buffer[re]);
+	       printf("\n");
+               if(memcmp(buffer,empty,len))
                {
+		       printf("not empty\n");
                   for(int re=0;re<len;re++)
                   {
-                     plain_text[pt_ctr] = buffer[len-re];
+                     plain_text[pt_ctr] = buffer[len-re-1];
                      pt_ctr++;
                   }
+		  cctr++;
                }
             }
             printf("print it back out\n");
-            printf("plain_text:%s\n",plain_text);
+for(int re=0;re<pt_ctr;re++)
+printf("%02X",plain_text[re]);
+printf("\n");
+
+	    printf("plain_text:%s\n",plain_text);
             break;
          }
          if(digitalRead(PIN_RG))
             printf("reset generator\n");
+
+	
 
            sleep(1);
       }

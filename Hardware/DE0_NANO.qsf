@@ -221,7 +221,7 @@ set_location_assignment PIN_B12 -to GPIO[33]
 #============================================================
 
 
-set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_global_assignment -name CDF_FILE Chain1.cdf
 set_global_assignment -name VHDL_FILE pll.vhd
 set_global_assignment -name BDF_FILE Block3.bdf

@@ -448,7 +448,7 @@ sleep(1);
 
             //when we right we don't get the reponse back on the initial one...
             memcpy(buffer,get_txt_char[0],4);
-            SPI_write(buffer,&len);
+            SPI_write(buffer,4);
             //read this one
             memcpy(buffer,get_txt_char[1],4);
             SPI_write_and_read(buffer,&len);

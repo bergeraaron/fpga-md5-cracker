@@ -71,7 +71,7 @@ Pin Name/Usage               : Location  : Dir.   : I/O Standard      : Voltage 
 -------------------------------------------------------------------------------------------------------------
 VCCIO8                       : A1        : power  :                   : 3.3V    : 8         :                
 GPIO[2]                      : A2        : output : 3.3-V LVTTL       :         : 8         : Y              
-RESERVED_INPUT               : A3        :        :                   :         : 8         :                
+GPIO[3]                      : A3        : output : 3.3-V LVTTL       :         : 8         : Y              
 RESERVED_INPUT               : A4        :        :                   :         : 8         :                
 RESERVED_INPUT               : A5        :        :                   :         : 8         :                
 RESERVED_INPUT               : A6        :        :                   :         : 8         :                
@@ -83,7 +83,7 @@ RESERVED_INPUT               : A11       :        :                   :         
 GPIO[30]                     : A12       : output : 3.3-V LVTTL       :         : 7         : Y              
 RESERVED_INPUT               : A13       :        :                   :         : 7         :                
 RESERVED_INPUT               : A14       :        :                   :         : 7         :                
-LED[0]                       : A15       : output : 3.3-V LVTTL       :         : 7         : Y              
+RESERVED_INPUT               : A15       :        :                   :         : 7         :                
 VCCIO7                       : A16       : power  :                   : 3.3V    : 7         :                
 RESERVED_INPUT               : B1        :        :                   :         : 1         :                
 GND                          : B2        : gnd    :                   :         :           :                
@@ -103,7 +103,7 @@ GND                          : B15       : gnd    :                   :         
 RESERVED_INPUT               : B16       :        :                   :         : 6         :                
 RESERVED_INPUT               : C1        :        :                   :         : 1         :                
 RESERVED_INPUT               : C2        :        :                   :         : 1         :                
-RESERVED_INPUT               : C3        :        :                   :         : 8         :                
+GPIO[1]                      : C3        : output : 3.3-V LVTTL       :         : 8         : Y              
 VCCIO8                       : C4        : power  :                   : 3.3V    : 8         :                
 GND                          : C5        : gnd    :                   :         :           :                
 RESERVED_INPUT               : C6        :        :                   :         : 8         :                
@@ -231,7 +231,7 @@ GPIO_1[31]                   : K15       : input  : 3.3-V LVTTL       :         
 RESERVED_INPUT               : K16       :        :                   :         : 5         :                
 RESERVED_INPUT               : L1        :        :                   :         : 2         :                
 RESERVED_INPUT               : L2        :        :                   :         : 2         :                
-LED[7]                       : L3        : output : 3.3-V LVTTL       :         : 2         : Y              
+RESERVED_INPUT               : L3        :        :                   :         : 2         :                
 RESERVED_INPUT               : L4        :        :                   :         : 2         :                
 VCCA1                        : L5        : power  :                   : 2.5V    :           :                
 VCCINT                       : L6        : power  :                   : 1.2V    :           :                

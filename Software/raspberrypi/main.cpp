@@ -150,11 +150,12 @@ int main(int argc, char * argv[])
    unsigned char get_cnt_low_spi_buffer[4] = {0x52,0x30,0x30,0x00};//low
    unsigned char get_cnt_high_spi_buffer[4] = {0x52,0x30,0x10,0x01};//high
    unsigned char get_text_char[4] = {0x44,0x33,0x22,0x11};
+   unsigned char nop[4] = {0x00,0x00,0x00,0x00};
 
    unsigned char get_txt_char[3][4] = { 
-   		                   {0x44,0x00,0x00,0x01},
-                                   {0x44,0x00,0x00,0x02},
-		                   {0x44,0x00,0x00,0x03}
+                                          {0x44,0x00,0x00,0x01},
+                                          {0x44,0x00,0x00,0x02},
+                                          {0x44,0x00,0x00,0x03}
                                       };
    uint32_t expected_off[4];
    expected_off[0] = 0x67452301;
@@ -441,35 +442,45 @@ sleep(1);
          {
             printf("hash matched\n");
             printf("pull the plain text off\n");
+            int cctr=0;
             int len = 4;
             unsigned char buffer[4];
-	    int cctr=0;
-            for(int xp=0;xp<5;xp++)
-            {
-               memcpy(buffer,get_txt_char[cctr],4);
-               SPI_write_and_read(buffer,&len);
-sleep(1);
-	       printf("return len:%d\n",len);
-	       for(int re=0;re<len;re++)
-		printf("%02X ",buffer[re]);
-	       printf("\n");
-               if(memcmp(buffer,empty,len))
-               {
-		       printf("not empty\n");
-                  for(int re=0;re<len;re++)
-                  {
-                     plain_text[pt_ctr] = buffer[len-re-1];
-                     pt_ctr++;
-                  }
-		  cctr++;
-               }
-            }
-            printf("print it back out\n");
-for(int re=0;re<pt_ctr;re++)
-printf("%02X",plain_text[re]);
-printf("\n");
 
-	    printf("plain_text:%s\n",plain_text);
+            //when we right we don't get the reponse back on the initial one...
+            memcpy(buffer,get_txt_char[0],4);
+            SPI_write(buffer,&len);
+            //read this one
+            memcpy(buffer,get_txt_char[1],4);
+            SPI_write_and_read(buffer,&len);
+            for(int re=0;re<len;re++)
+            {
+               plain_text[pt_ctr] = buffer[len-re-1];
+               pt_ctr++;
+            }
+            //read this one
+            memcpy(buffer,get_txt_char[2],4);
+            SPI_write_and_read(buffer,&len);
+            for(int re=0;re<len;re++)
+            {
+               plain_text[pt_ctr] = buffer[len-re-1];
+               pt_ctr++;
+            }
+            //nop but read this one too
+            //read this one
+            memcpy(buffer,nop,4);
+            SPI_write_and_read(buffer,&len);
+            for(int re=0;re<len;re++)
+            {
+               plain_text[pt_ctr] = buffer[len-re-1];
+               pt_ctr++;
+            }
+
+            printf("print it back out\n");
+            for(int re=0;re<pt_ctr;re++)
+               printf("%02X",plain_text[re]);
+            printf("\n");
+
+	         printf("plain_text:%s\n",plain_text);
             break;
          }
          if(digitalRead(PIN_RG))

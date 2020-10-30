@@ -209,7 +209,6 @@ always @(posedge hasReceived)
 							begin
 								resetGenerator <= 0;
 								reset2 <= 0;
-								dataOut <= 32'b01010101010101010101010101010101;
 							end
 						`Command_SetExpectedA:
 							begin
@@ -283,25 +282,21 @@ always @(posedge hasReceived)
 				begin
 					expectedA <= dataIn;
 					controllerState <= `Controller_Waiting;
-					dataOut <= 32'b00000000111111110000000011111111;
 				end
 			`Controller_SetExpectedB:
 				begin
 					expectedB <= dataIn;
 					controllerState <= `Controller_Waiting;
-					dataOut <= 32'b11111111000000001111111100000000;
 				end
 			`Controller_SetExpectedC:
 				begin
 					expectedC <= dataIn;
 					controllerState <= `Controller_Waiting;
-					dataOut <= 32'b11111111111111110000000000000000;
 				end
 			`Controller_SetExpectedD:
 				begin
 					expectedD <= dataIn;
 					controllerState <= `Controller_Waiting;
-					dataOut <= 32'b00000000000000001111111111111111;
 				end
 			`Controller_SetRange:
 				begin
@@ -310,7 +305,6 @@ always @(posedge hasReceived)
 					//min <= 8'h61;
 					//max <= 8'h7a;
 					controllerState <= `Controller_Waiting;
-					dataOut <= 32'b10101010101010101010101010101010;
 				end
 		endcase	
 	end

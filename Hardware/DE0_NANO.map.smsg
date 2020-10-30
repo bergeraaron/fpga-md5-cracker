@@ -1,0 +1,1 @@
+Warning (10268): Verilog HDL information at Md5BruteForcer.v(191): always construct contains both blocking and non-blocking assignments File: C:/Users/berge/Documents/GitHub/fpga-md5-cracker/Hardware/Md5BruteForcer.v Line: 191

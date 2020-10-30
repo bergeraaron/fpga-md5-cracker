@@ -19,8 +19,10 @@ reg [63:0] count;
 reg [7:0] min = 'h61, max = 'h7a;
 //reg [7:0] min = 'h41, max = 'h7a;
 wire [511:0] chunk;
+reg [7:0] textctr = 'h00;
 
 reg [127:0] textBuffer [0:63];
+
 
 Md5PrintableChunkGenerator g(
 	.clk(clk), 
@@ -59,6 +61,7 @@ always @(posedge clk or posedge reset2)
 			begin
 				hasMatched <= 0;
 				matchFound <= 0;
+				hasMatched <= 0;
 				text <= 0;
             count <= 0;
 			end
@@ -176,6 +179,13 @@ always @(posedge clk or posedge reset2)
 `define Command_GetCountLow         'h52303000
 `define Command_GetCountHigh        'h52303001
 
+`define Command_GetTextChar			'h44332211
+`define Command_GetTextChar1			'h44000001
+`define Command_GetTextChar2			'h44000002
+`define Command_GetTextChar3			'h44000003
+
+
+
 reg [7:0] controllerState = `Controller_Waiting;
 
 always @(posedge hasReceived)
@@ -185,11 +195,15 @@ always @(posedge hasReceived)
 				begin
 					dataOut <= 32'b00000000000000000000000000000000;
 					case (dataIn)
-						`Command_ResetGenerator:
+						`Command_NoOp:
+							begin
+								dataOut <= 0;
+							end
+						`Command_ResetGenerator: 
 							begin
 								resetGenerator <= 1;
 								reset2 <= 1;
-								dataOut <= 32'b11111111111111111111111111111111;
+								dataOut <= 0;
 							end
 						`Command_StartGenerator:
 							begin
@@ -225,6 +239,44 @@ always @(posedge hasReceived)
 							begin
 								dataOut <= count[63:32];
 							end
+						`Command_SetExpectedA: controllerState <= `Controller_SetExpectedA;
+						`Command_SetExpectedB: controllerState <= `Controller_SetExpectedB;
+						`Command_SetExpectedC: controllerState <= `Controller_SetExpectedC;
+						`Command_SetExpectedD: controllerState <= `Controller_SetExpectedD;
+						`Command_SetRange: controllerState <= `Controller_SetRange;
+                  `Command_GetCountLow: dataOut <= count[31:0];
+                  `Command_GetCountHigh: dataOut <= count[63:32];
+						`Command_GetTextChar:
+							begin
+							if(textctr == 0)
+								begin
+									dataOut <= text[31:0];
+									textctr = textctr + 1;
+								end
+							else if(textctr == 1)
+								begin
+									dataOut <= text[63:32];
+									textctr = textctr + 1;								
+								end
+							else if(textctr == 2)
+								begin
+									dataOut <= text[127:64];								
+									textctr = 0;
+								end
+							//dataOut <= text[textctr+31:textctr];
+							end
+						`Command_GetTextChar1:
+							begin
+									dataOut <= text[31:0];
+							end
+						`Command_GetTextChar2:
+							begin
+									dataOut <= text[63:32];
+							end
+						`Command_GetTextChar3:
+							begin
+									dataOut <= text[127:64];
+							end							
 					endcase					
 				end
 			`Controller_SetExpectedA:

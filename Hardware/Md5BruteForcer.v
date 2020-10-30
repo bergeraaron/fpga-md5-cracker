@@ -169,6 +169,9 @@ always @(posedge clk or posedge reset2)
 `define Command_GetCountHigh        'h52303001
 
 `define Command_GetTextChar			'h44332211
+`define Command_GetTextChar1			'h44000001
+`define Command_GetTextChar2			'h44000002
+`define Command_GetTextChar3			'h44000003
 
 
 
@@ -180,10 +183,15 @@ always @(posedge hasReceived)
 			`Controller_Waiting:
 				begin
 					case (dataIn)
+						`Command_NoOp:
+							begin
+								dataOut <= 0;
+							end
 						`Command_ResetGenerator: 
 							begin
 								resetGenerator <= 1;
 								reset2 <= 1;
+								dataOut <= 0;
 							end
 						`Command_StartGenerator: 
 							begin
@@ -202,18 +210,32 @@ always @(posedge hasReceived)
 							if(textctr == 0)
 								begin
 									dataOut <= text[31:0];
+									textctr = textctr + 1;
 								end
 							else if(textctr == 1)
 								begin
-									dataOut <= text[63:32];								
+									dataOut <= text[63:32];
+									textctr = textctr + 1;								
 								end
 							else if(textctr == 2)
 								begin
 									dataOut <= text[127:64];								
+									textctr = 0;
 								end
 							//dataOut <= text[textctr+31:textctr];
-							textctr = textctr + 1;
 							end
+						`Command_GetTextChar1:
+							begin
+									dataOut <= text[31:0];
+							end
+						`Command_GetTextChar2:
+							begin
+									dataOut <= text[63:32];
+							end
+						`Command_GetTextChar3:
+							begin
+									dataOut <= text[127:64];
+							end							
 					endcase					
 				end
 			`Controller_SetExpectedA:

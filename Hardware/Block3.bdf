@@ -516,7 +516,7 @@ https://fpgasoftware.intel.com/eula.
 	(drawing
 		(rectangle (rect 16 16 304 96))
 	)
-	(annotation_block (parameter)(rect 808 208 1004 236))
+	(annotation_block (parameter)(rect 584 208 808 248))
 )
 (symbol
 	(rect 736 48 904 160)
@@ -644,11 +644,6 @@ https://fpgasoftware.intel.com/eula.
 	(bus)
 )
 (connector
-	(pt 800 376)
-	(pt 800 328)
-	(bus)
-)
-(connector
 	(pt 704 96)
 	(pt 704 192)
 	(bus)
@@ -687,11 +682,6 @@ https://fpgasoftware.intel.com/eula.
 	(pt 816 312)
 )
 (connector
-	(pt 800 328)
-	(pt 816 328)
-	(bus)
-)
-(connector
 	(pt 704 96)
 	(pt 736 96)
 	(bus)
@@ -712,11 +702,6 @@ https://fpgasoftware.intel.com/eula.
 (connector
 	(pt 1152 64)
 	(pt 1184 64)
-	(bus)
-)
-(connector
-	(pt 800 376)
-	(pt 1200 376)
 	(bus)
 )
 (connector
@@ -869,6 +854,21 @@ https://fpgasoftware.intel.com/eula.
 (connector
 	(pt 744 408)
 	(pt 952 408)
+)
+(connector
+	(pt 800 376)
+	(pt 800 328)
+	(bus)
+)
+(connector
+	(pt 816 328)
+	(pt 800 328)
+	(bus)
+)
+(connector
+	(pt 1200 376)
+	(pt 800 376)
+	(bus)
 )
 (junction (pt 720 80))
 (junction (pt 744 408))

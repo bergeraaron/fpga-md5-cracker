@@ -181,14 +181,14 @@ namespace Md5UI
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _client = new TcpClient();
-            _client.Connect("192.168.1.200", 5230);
+            _client.Connect("192.168.2.15", 5230);
             _stream = _client.GetStream();
             new Thread(() =>
             {
                 while (true)
                 {
                     ulong count;
-
+/**
                     lock (_stream)
                     {
                         try
@@ -217,8 +217,8 @@ namespace Md5UI
 
                     Application.Current.Dispatcher.Invoke(() =>
                         CountTextBox.Text = string.Format("{0:##,##}", count));
-
-                    Thread.Sleep(10);
+/**/
+                    Thread.Sleep(100000);
                 }
             }) { IsBackground = true }.Start();
             
@@ -256,12 +256,12 @@ namespace Md5UI
                 BitConverter.ToUInt32(digest, 8),
                 BitConverter.ToUInt32(digest, 12),
             };
-
+/**/
             parts[0] -= 0x67452301;
             parts[1] -= 0xefcdab89;
             parts[2] -= 0x98badcfe;
             parts[3] -= 0x10325476;
-
+/**/
             return parts;
         }
 
@@ -269,13 +269,13 @@ namespace Md5UI
         {
             lock (_stream)
             {
-                ResetButton_Click(sender, e);
+                //ResetButton_Click(sender, e);
                 var values = ParseHash(Md5TextBox.Text);
                 SetExpectedValues(values[0], values[1], values[2], values[3]);
-                var min = GetBytes(MinTextBox.Text)[0];
-                var max = GetBytes(MaxTextBox.Text)[0];
-                var range = BitConverter.ToUInt32(new byte[] { min, max, 0, 0 }, 0);
-                WriteUInt32(CommandOpcode.SetRange, range);
+                //var min = GetBytes(MinTextBox.Text)[0];
+                //var max = GetBytes(MaxTextBox.Text)[0];
+                //var range = BitConverter.ToUInt32(new byte[] { min, max, 0, 0 }, 0);
+                //WriteUInt32(CommandOpcode.SetRange, range);
                 StartButton_Click(sender, e);
             }
             //SetExpectedValues(0x40fcc7e8, 0xa8285a73, 0xb90903ae, 0x4eb4d049);

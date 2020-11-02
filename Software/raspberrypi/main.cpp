@@ -147,7 +147,7 @@ int main(int argc, char * argv[])
    unsigned char set_exp_c_spi_buffer[4] = {0x52,0x30,0x10,0x02};
    unsigned char set_exp_d_spi_buffer[4] = {0x52,0x30,0x10,0x03};
    unsigned char set_range_spi_buffer[4] = {0x52,0x30,0x20,0x00};
-   unsigned char get_cnt_low_spi_buffer[4] = {0x52,0x30,0x30,0x00};//low
+   unsigned char get_cnt_low_spi_buffer[4] = {0x52,0x30,0x10,0x00};//low
    unsigned char get_cnt_high_spi_buffer[4] = {0x52,0x30,0x10,0x01};//high
    unsigned char get_text_char[4] = {0x44,0x33,0x22,0x11};
    unsigned char nop[4] = {0x00,0x00,0x00,0x00};
@@ -327,8 +327,8 @@ int main(int argc, char * argv[])
                      memset(spi_buffer,0x00,4);
                      memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
                      SPI_write(spi_buffer,4);
-                     
-                     memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+                     memset(spi_buffer,0x00,4); 
+                     memcpy(spi_buffer,get_cnt_low_spi_buffer,4);
                      len = 4;
                      SPI_write_and_read(spi_buffer,&len);
                      for(int re = 0;re < len;re++)
@@ -337,7 +337,7 @@ int main(int argc, char * argv[])
                         buf_ctr++;
                      }
 
-                     memcpy(spi_buffer,nop[0],4);
+                     memcpy(spi_buffer,nop,4);
                      len = 4;
                      SPI_write_and_read(spi_buffer,&len);
                      for(int re = 0;re < len;re++)
@@ -509,19 +509,20 @@ sleep(1);
                printf("reset generator\n");            
             else
             {
+/**
                //we should be running so
                //we can try and get the count
                unsigned char c_buffer[8];
                int len = 4;
                int buf_ctr = 0;
                memset(c_buffer,0x00,8);
-               unsigned int counter = 0;
+               uint64_t counter = 0;
                printf("get count\n");
                memset(spi_buffer,0x00,4);
                memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
                SPI_write(spi_buffer,4);
-               
-               memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+               memset(spi_buffer,0x00,4);
+               memcpy(spi_buffer,get_cnt_low_spi_buffer,4);
                len = 4;
                SPI_write_and_read(spi_buffer,&len);
                for(int re = 0;re < len;re++)
@@ -530,7 +531,7 @@ sleep(1);
                   buf_ctr++;
                }
 
-               memcpy(spi_buffer,nop[0],4);
+               memcpy(spi_buffer,nop,4);
                len = 4;
                SPI_write_and_read(spi_buffer,&len);
                for(int re = 0;re < len;re++)
@@ -538,9 +539,9 @@ sleep(1);
                   c_buffer[buf_ctr] = spi_buffer[len-re-1];
                   buf_ctr++;
                }
-               counter = (unsigned int *)&c_buffer;
+               counter = (uint64_t)(*(uint64_t*)&c_buffer[0]);
                printf("count:%d\n",counter);
-
+**/
             }  
          }
 

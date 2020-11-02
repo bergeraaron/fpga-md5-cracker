@@ -179,7 +179,7 @@ module Md5Core (
   reg [31:0] w60 [0:15];
   reg [31:0] w61 [0:15];
   reg [31:0] w62 [0:15];
-//  reg [31:0] w63 [0:15];
+  reg [31:0] w63 [0:15];
   
   always @(posedge clk)
     begin
@@ -433,10 +433,10 @@ module Md5Core (
 
       `CopyDigestWords(a63, d62, d63, c62, c63, b62)
       b63 <= b62 + (((a62 + (c62 ^ (b62 | (~d62))) + 'h2ad7d2bb + w62[(7 * 62) % 16]) << 15) | ((a62 + (c62 ^ (b62 | (~d62))) + 'h2ad7d2bb + w62[(7 * 62) % 16]) >> (32 - 15)));
-//      `CopyChunkWords(w63, w62)
+      `CopyChunkWords(w63, w62)
 
-//      `CopyDigestWords(a64, d63, d64, c63, c64, b63)
-//      b64 <= b63 + (((a63 + (c63 ^ (b63 | (~d63))) + 'heb86d391 + w63[(7 * 63) % 16]) << 21) | ((a63 + (c63 ^ (b63 | (~d63))) + 'heb86d391 + w63[(7 * 63) % 16]) >> (32 - 21)));      
+      `CopyDigestWords(a64, d63, d64, c63, c64, b63)
+      b64 <= b63 + (((a63 + (c63 ^ (b63 | (~d63))) + 'heb86d391 + w63[(7 * 63) % 16]) << 21) | ((a63 + (c63 ^ (b63 | (~d63))) + 'heb86d391 + w63[(7 * 63) % 16]) >> (32 - 21)));      
     end
 endmodule
 

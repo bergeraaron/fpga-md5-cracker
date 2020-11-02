@@ -320,10 +320,31 @@ int main(int argc, char * argv[])
                   }
                   else if(buffer[xp] == 0x30)//get count
                   {
+                     int len = 4;
+                     memset(out_buffer,0x00,8);
+                     int buf_ctr = 0;
                      printf("get count\n");
-                     //SPI_write(spi_buffer,4);
-                     SPI_write(get_cnt_low_spi_buffer,4);
-                     SPI_write(get_cnt_high_spi_buffer,4);
+                     memset(spi_buffer,0x00,4);
+                     memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+                     SPI_write(spi_buffer,4);
+                     
+                     memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+                     len = 4;
+                     SPI_write_and_read(spi_buffer,&len);
+                     for(int re = 0;re < len;re++)
+                     {
+                        out_buffer[buf_ctr] = spi_buffer[len-re-1];
+                        buf_ctr++;
+                     }
+
+                     memcpy(spi_buffer,nop[0],4);
+                     len = 4;
+                     SPI_write_and_read(spi_buffer,&len);
+                     for(int re = 0;re < len;re++)
+                     {
+                        out_buffer[buf_ctr] = spi_buffer[len-re-1];
+                        buf_ctr++;
+                     }
 
                      xp+=3;
                   }
@@ -338,7 +359,6 @@ int main(int argc, char * argv[])
 
                //printf("write back\n");
                //just write back
-               memset(out_buffer,0x00,8);
                write(connfd, out_buffer, 8); 
             }
 
@@ -483,10 +503,46 @@ sleep(1);
 	         printf("plain_text:%s\n",plain_text);
             break;
          }
-         if(digitalRead(PIN_RG))
-            printf("reset generator\n");
+         else
+         {
+            if(digitalRead(PIN_RG))
+               printf("reset generator\n");            
+            else
+            {
+               //we should be running so
+               //we can try and get the count
+               unsigned char c_buffer[8];
+               int len = 4;
+               int buf_ctr = 0;
+               memset(c_buffer,0x00,8);
+               unsigned int counter = 0;
+               printf("get count\n");
+               memset(spi_buffer,0x00,4);
+               memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+               SPI_write(spi_buffer,4);
+               
+               memcpy(spi_buffer,get_cnt_high_spi_buffer,4);
+               len = 4;
+               SPI_write_and_read(spi_buffer,&len);
+               for(int re = 0;re < len;re++)
+               {
+                  c_buffer[buf_ctr] = spi_buffer[len-re-1];
+                  buf_ctr++;
+               }
 
-	
+               memcpy(spi_buffer,nop[0],4);
+               len = 4;
+               SPI_write_and_read(spi_buffer,&len);
+               for(int re = 0;re < len;re++)
+               {
+                  c_buffer[buf_ctr] = spi_buffer[len-re-1];
+                  buf_ctr++;
+               }
+               counter = (unsigned int *)&c_buffer;
+               printf("count:%d\n",counter);
+
+            }  
+         }
 
            sleep(1);
       }

@@ -1,0 +1,149 @@
+------------------------------------------------------------
+TimeQuest Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow Model Setup 'inst|altpll_component|pll|clk[2]'
+Slack : -7.838
+TNS   : -27590.527
+
+Type  : Slow Model Setup 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -5.949
+TNS   : -453.380
+
+Type  : Slow Model Setup 'GPIO_00'
+Slack : -2.702
+TNS   : -50.786
+
+Type  : Slow Model Setup 'SpiSlave:inst5|shiftComplete'
+Slack : -0.818
+TNS   : -16.133
+
+Type  : Slow Model Setup 'inst|altpll_component|pll|clk[1]'
+Slack : 3.990
+TNS   : 0.000
+
+Type  : Slow Model Hold 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -1.076
+TNS   : -25.866
+
+Type  : Slow Model Hold 'inst|altpll_component|pll|clk[2]'
+Slack : -0.032
+TNS   : -0.032
+
+Type  : Slow Model Hold 'inst|altpll_component|pll|clk[1]'
+Slack : 0.391
+TNS   : 0.000
+
+Type  : Slow Model Hold 'GPIO_00'
+Slack : 0.523
+TNS   : 0.000
+
+Type  : Slow Model Hold 'SpiSlave:inst5|shiftComplete'
+Slack : 0.960
+TNS   : 0.000
+
+Type  : Slow Model Recovery 'inst|altpll_component|pll|clk[2]'
+Slack : -4.022
+TNS   : -1371.502
+
+Type  : Slow Model Removal 'inst|altpll_component|pll|clk[2]'
+Slack : 4.792
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'GPIO_00'
+Slack : -1.222
+TNS   : -51.222
+
+Type  : Slow Model Minimum Pulse Width 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -0.500
+TNS   : -191.000
+
+Type  : Slow Model Minimum Pulse Width 'SpiSlave:inst5|shiftComplete'
+Slack : -0.500
+TNS   : -32.000
+
+Type  : Slow Model Minimum Pulse Width 'inst|altpll_component|pll|clk[2]'
+Slack : 2.873
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'inst|altpll_component|pll|clk[1]'
+Slack : 9.000
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'CLOCK_50'
+Slack : 10.000
+TNS   : 0.000
+
+Type  : Fast Model Setup 'inst|altpll_component|pll|clk[2]'
+Slack : -3.503
+TNS   : -12240.274
+
+Type  : Fast Model Setup 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -2.123
+TNS   : -117.778
+
+Type  : Fast Model Setup 'GPIO_00'
+Slack : -0.765
+TNS   : -11.893
+
+Type  : Fast Model Setup 'SpiSlave:inst5|shiftComplete'
+Slack : 0.276
+TNS   : 0.000
+
+Type  : Fast Model Setup 'inst|altpll_component|pll|clk[1]'
+Slack : 7.321
+TNS   : 0.000
+
+Type  : Fast Model Hold 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -0.929
+TNS   : -25.768
+
+Type  : Fast Model Hold 'inst|altpll_component|pll|clk[2]'
+Slack : 0.037
+TNS   : 0.000
+
+Type  : Fast Model Hold 'inst|altpll_component|pll|clk[1]'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Hold 'GPIO_00'
+Slack : 0.240
+TNS   : 0.000
+
+Type  : Fast Model Hold 'SpiSlave:inst5|shiftComplete'
+Slack : 0.298
+TNS   : 0.000
+
+Type  : Fast Model Recovery 'inst|altpll_component|pll|clk[2]'
+Slack : -2.135
+TNS   : -728.035
+
+Type  : Fast Model Removal 'inst|altpll_component|pll|clk[2]'
+Slack : 3.015
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'GPIO_00'
+Slack : -1.222
+TNS   : -51.222
+
+Type  : Fast Model Minimum Pulse Width 'CrossDomainBuffer:inst2|syncSaved[1]'
+Slack : -0.500
+TNS   : -191.000
+
+Type  : Fast Model Minimum Pulse Width 'SpiSlave:inst5|shiftComplete'
+Slack : -0.500
+TNS   : -32.000
+
+Type  : Fast Model Minimum Pulse Width 'inst|altpll_component|pll|clk[2]'
+Slack : 2.873
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'inst|altpll_component|pll|clk[1]'
+Slack : 9.000
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'CLOCK_50'
+Slack : 10.000
+TNS   : 0.000
+
+------------------------------------------------------------

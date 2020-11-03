@@ -1,0 +1,14 @@
+Analysis & Synthesis Status : Successful - Mon Nov 02 09:37:09 2020
+Quartus II 32-bit Version : 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition
+Revision Name : fpga_md5
+Top-level Entity Name : fpga_md5
+Family : Cyclone II
+Total logic elements : 25,080
+    Total combinational functions : 18,358
+    Dedicated logic registers : 17,523
+Total registers : 17523
+Total pins : 16
+Total virtual pins : 0
+Total memory bits : 6,364
+Embedded Multiplier 9-bit elements : 0
+Total PLLs : 1

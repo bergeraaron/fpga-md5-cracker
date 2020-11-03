@@ -19,9 +19,10 @@ reg [63:0] count;
 reg [7:0] min = 'h61, max = 'h7a;
 //reg [7:0] min = 'h41, max = 'h7a;
 wire [511:0] chunk;
-reg [7:0] textctr = 'h00;
 
-reg [127:0] textBuffer [0:63];
+reg [127:0] textBuffer;
+reg [7:0] txttmp = 'h00;
+reg [7:0] carry = 'h00;
 
 
 Md5PrintableChunkGenerator g(
@@ -69,7 +70,45 @@ always @(posedge clk or posedge reset2)
 			begin
 				if (!matchFound)
 					begin
-						textBuffer[0] <= chunk[127:0];
+
+					textBuffer <= chunk[127:0];
+
+					//initial is an offset of 0x0B
+					txttmp = chunk[7:0];
+					if((txttmp - 'h0B) >= min)
+						begin
+							txttmp = txttmp - 'h0B;
+							textBuffer[7:0] <= txttmp;
+							carry = 'h00;
+						end
+					else
+						begin
+							txttmp = max - ('h0B - (txttmp - min)) + 'h01;
+							textBuffer[7:0] <= txttmp;
+							carry = 'h01;
+						end
+					
+					//the next is 0x02, unless there is a carry and then it is + 1
+					txttmp = chunk[15:8];
+					if((txttmp - 'h02) >= min)
+						begin
+							txttmp = txttmp - 'h02 - carry;
+							textBuffer[15:8] <= txttmp;
+							carry = 'h00;
+						end
+					else
+						begin
+							txttmp = max - ('h02 - (txttmp - min)) + 'h01 - carry;
+							textBuffer[15:8] <= txttmp;
+							carry = 'h01;
+						end
+					
+					
+					text <= textBuffer;
+
+					
+/**
+					textBuffer[0] <= chunk[127:0];
 						textBuffer[1] <= textBuffer[0];
 						textBuffer[2] <= textBuffer[1];
 						textBuffer[3] <= textBuffer[2];
@@ -134,7 +173,7 @@ always @(posedge clk or posedge reset2)
 						textBuffer[62] <= textBuffer[61];
 						textBuffer[63] <= textBuffer[62];
 						text <= textBuffer[63];
-/**/
+**/
 						if (a == expectedA &&
 							b == expectedB &&
 							c == expectedC &&
@@ -143,14 +182,7 @@ always @(posedge clk or posedge reset2)
 								matchFound <= 1;
 								hasMatched <= 1;
 							end
-/**/
-/**
-						if (a == expectedA)
-							begin
-								matchFound <= 1;
-								hasMatched <= 1;
-							end
-**/
+
                   count <= count + 1;
 					end
 			end
@@ -179,10 +211,10 @@ always @(posedge clk or posedge reset2)
 `define Command_GetCountLow         'h52303000
 `define Command_GetCountHigh        'h52303001
 
-`define Command_GetTextChar			'h44332211
 `define Command_GetTextChar1			'h44000001
 `define Command_GetTextChar2			'h44000002
 `define Command_GetTextChar3			'h44000003
+`define Command_GetTextChar4			'h44000004
 
 
 
@@ -193,7 +225,6 @@ always @(posedge hasReceived)
 		case (controllerState)
 			`Controller_Waiting:
 				begin
-					dataOut <= 32'b00000000000000000000000000000000;
 					case (dataIn)
 						`Command_NoOp:
 							begin
@@ -245,25 +276,6 @@ always @(posedge hasReceived)
 						`Command_SetRange: controllerState <= `Controller_SetRange;
                   `Command_GetCountLow: dataOut <= count[31:0];
                   `Command_GetCountHigh: dataOut <= count[63:32];
-						`Command_GetTextChar:
-							begin
-							if(textctr == 0)
-								begin
-									dataOut <= text[31:0];
-									textctr = textctr + 1;
-								end
-							else if(textctr == 1)
-								begin
-									dataOut <= text[63:32];
-									textctr = textctr + 1;								
-								end
-							else if(textctr == 2)
-								begin
-									dataOut <= text[127:64];								
-									textctr = 0;
-								end
-							//dataOut <= text[textctr+31:textctr];
-							end
 						`Command_GetTextChar1:
 							begin
 									dataOut <= text[31:0];
@@ -274,8 +286,12 @@ always @(posedge hasReceived)
 							end
 						`Command_GetTextChar3:
 							begin
-									dataOut <= text[127:64];
-							end							
+									dataOut <= text[95:64];
+							end
+						`Command_GetTextChar4:
+							begin
+									dataOut <= text[127:96];
+							end
 					endcase					
 				end
 			`Controller_SetExpectedA:

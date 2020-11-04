@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE22F17) Path("C:/Users/berge/Documents/GitHub/fpga-md5-cracker/Hardware/") File("DE0_NANO.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE22F17) Path("C:/Users/berge/Documents/GitHub/fpga-md5-cracker/Hardware/DE0_Nano/") File("DE0_NANO.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 

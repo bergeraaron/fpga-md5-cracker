@@ -152,10 +152,11 @@ int main(int argc, char * argv[])
    unsigned char get_text_char[4] = {0x44,0x33,0x22,0x11};
    unsigned char nop[4] = {0x00,0x00,0x00,0x00};
 
-   unsigned char get_txt_char[3][4] = { 
+   unsigned char get_txt_char[4][4] = { 
                                           {0x44,0x00,0x00,0x01},
                                           {0x44,0x00,0x00,0x02},
-                                          {0x44,0x00,0x00,0x03}
+                                          {0x44,0x00,0x00,0x03},
+					  {0x44,0x00,0x00,0x04}
                                       };
    uint32_t expected_off[4];
    expected_off[0] = 0x67452301;
@@ -456,7 +457,7 @@ sleep(1);
       //loop and look for a response
       while(true)
       {
-         printf("check pins\n");
+         //printf("check pins\n");
 
          if(digitalRead(PIN_HM))
          {
@@ -485,6 +486,14 @@ sleep(1);
                plain_text[pt_ctr] = buffer[len-re-1];
                pt_ctr++;
             }
+	    //read this one
+	    memcpy(buffer,get_txt_char[3],4);
+	    SPI_write_and_read(buffer,&len);
+	    for(int re=0;re<len;re++)
+	    {
+               plain_text[pt_ctr] = buffer[len-re-1];
+	       pt_ctr++;
+	    }
             //nop but read this one too
             //read this one
             memcpy(buffer,nop,4);

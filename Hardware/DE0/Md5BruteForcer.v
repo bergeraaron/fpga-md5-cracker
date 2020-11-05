@@ -19,9 +19,10 @@ reg [63:0] count;
 reg [7:0] min = 'h61, max = 'h7a;
 //reg [7:0] min = 'h41, max = 'h7a;
 wire [511:0] chunk;
-reg [7:0] textctr = 'h00;
 
-//reg [127:0] textBuffer [0:63];
+reg [127:0] textBuffer;
+reg [7:0] txttmp = 'h00;
+reg [7:0] carry = 'h00;
 
 
 Md5PrintableChunkGenerator g(
@@ -69,8 +70,243 @@ always @(posedge clk or posedge reset2)
 			begin
 				if (!matchFound)
 					begin
-					text <= chunk;
-					/*
+
+					textBuffer <= chunk[127:0];
+
+					//initial is an offset of 0x0B
+					// 1
+					txttmp = chunk[7:0];
+					if((txttmp - 'h0B) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - 'h0B;
+							textBuffer[7:0] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ('h0B - (txttmp - min)) + 'h01;
+							textBuffer[7:0] <= txttmp;
+							carry = 'h01;
+						end
+					//the next is 0x02, unless there is a carry and then it is + 1
+					// 2
+					txttmp = chunk[15:8];
+					if((txttmp - 'h02) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - 'h02 - carry;
+							textBuffer[15:8] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ('h02 - (txttmp - min)) + 'h01 - carry;
+							textBuffer[15:8] <= txttmp;
+							carry = 'h01;
+						end
+					//everything should just be a carry after this?
+					// 3
+					txttmp = chunk[23:16];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[23:16] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[23:16] <= txttmp;
+							carry = 'h01;
+						end
+					// 4
+					txttmp = chunk[31:24];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[31:24] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[31:24] <= txttmp;
+							carry = 'h01;
+						end
+					// 5
+					txttmp = chunk[39:32];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[39:32] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[39:32] <= txttmp;
+							carry = 'h01;
+						end
+					// 6
+					txttmp = chunk[47:40];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[47:40] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[47:40] <= txttmp;
+							carry = 'h01;
+						end
+					// 7
+					txttmp = chunk[55:48];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[55:48] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[55:48] <= txttmp;
+							carry = 'h01;
+						end
+					// 8
+					txttmp = chunk[63:56];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[63:56] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[63:56] <= txttmp;
+							carry = 'h01;
+						end
+					// 9
+					txttmp = chunk[71:64];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[71:64] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[71:64] <= txttmp;
+							carry = 'h01;
+						end
+					// 10
+					txttmp = chunk[79:72];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[79:72] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[79:72] <= txttmp;
+							carry = 'h01;
+						end
+					// 11
+					txttmp = chunk[87:80];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[87:80] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[87:80] <= txttmp;
+							carry = 'h01;
+						end
+					// 12
+					txttmp = chunk[95:88];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[95:88] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[95:88] <= txttmp;
+							carry = 'h01;
+						end
+					// 13
+					txttmp = chunk[103:96];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[103:96] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[103:96] <= txttmp;
+							carry = 'h01;
+						end
+					// 14
+					txttmp = chunk[111:104];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[111:104] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[111:104] <= txttmp;
+							carry = 'h01;
+						end
+					// 15
+					txttmp = chunk[119:112];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[119:112] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[119:112] <= txttmp;
+							carry = 'h01;
+						end
+					// 16
+					txttmp = chunk[127:120];
+					if((txttmp - carry) >= min && txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = txttmp - carry;
+							textBuffer[127:120] <= txttmp;
+							carry = 'h00;
+						end
+					else if(txttmp != 'h00 && txttmp != 'h80)
+						begin
+							txttmp = max - ((txttmp - min)) + 'h01 - carry;
+							textBuffer[127:120] <= txttmp;
+							carry = 'h01;
+						end						
+/**/
+
+
+					text <= textBuffer;
+
+					
+/**
 					textBuffer[0] <= chunk[127:0];
 						textBuffer[1] <= textBuffer[0];
 						textBuffer[2] <= textBuffer[1];
@@ -146,7 +382,7 @@ always @(posedge clk or posedge reset2)
 								hasMatched <= 1;
 							end
 
-							count <= count + 1;
+                  count <= count + 1;
 					end
 			end
 	end
@@ -174,10 +410,11 @@ always @(posedge clk or posedge reset2)
 `define Command_GetCountLow         'h52303000
 `define Command_GetCountHigh        'h52303001
 
-`define Command_GetTextChar			'h44332211
 `define Command_GetTextChar1			'h44000001
 `define Command_GetTextChar2			'h44000002
 `define Command_GetTextChar3			'h44000003
+`define Command_GetTextChar4			'h44000004
+
 
 
 reg [7:0] controllerState = `Controller_Waiting;
@@ -238,25 +475,6 @@ always @(posedge hasReceived)
 						`Command_SetRange: controllerState <= `Controller_SetRange;
                   `Command_GetCountLow: dataOut <= count[31:0];
                   `Command_GetCountHigh: dataOut <= count[63:32];
-						`Command_GetTextChar:
-							begin
-							if(textctr == 0)
-								begin
-									dataOut <= text[31:0];
-									textctr = textctr + 1;
-								end
-							else if(textctr == 1)
-								begin
-									dataOut <= text[63:32];
-									textctr = textctr + 1;								
-								end
-							else if(textctr == 2)
-								begin
-									dataOut <= text[127:64];								
-									textctr = 0;
-								end
-							//dataOut <= text[textctr+31:textctr];
-							end
 						`Command_GetTextChar1:
 							begin
 									dataOut <= text[31:0];
@@ -267,8 +485,12 @@ always @(posedge hasReceived)
 							end
 						`Command_GetTextChar3:
 							begin
-									dataOut <= text[127:64];
-							end							
+									dataOut <= text[95:64];
+							end
+						`Command_GetTextChar4:
+							begin
+									dataOut <= text[127:96];
+							end
 					endcase					
 				end
 			`Controller_SetExpectedA:
